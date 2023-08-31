@@ -1,4 +1,10 @@
 #graphiques pour differents tmax de la solution numeriques  de deux solitons en collision
+
+import numpy as np
+import numpy.fft as fft
+from matplotlib import pyplot as plt
+from matplotlib.animation import FuncAnimation
+
 L = 50  # Length of domain
 N = 256  # Number of grid points
 dt = 0.004  # Timestep
