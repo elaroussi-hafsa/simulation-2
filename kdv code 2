@@ -1,9 +1,9 @@
 #graphiques pour differents tmax de la solution numeriques  de deux solitons en collision
 
 import numpy as np
-import numpy.fft as fft
-from matplotlib import pyplot as plt
-from matplotlib.animation import FuncAnimation
+from scipy.fftpack import fft, ifft, fftfreq, fftshift, ifftshift
+import matplotlib.pyplot as plt
+import math
 
 L = 50  # Length of domain
 N = 256  # Number of grid points
