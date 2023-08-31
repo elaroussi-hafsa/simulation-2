@@ -1,0 +1,65 @@
+#graphiques pour differents tmax de la solution numeriques  de deux solitons en collision
+L = 50  # Length of domain
+N = 256  # Number of grid points
+dt = 0.004  # Timestep
+x = np.linspace(0, L, N)  # Spatial grid
+k = np.linspace(-int(N / 2), int(N / 2) - 1, N)  # wavenumbers
+
+# Define the parameters for the two solitons
+c1 = 0.75
+a1 = 0.33
+c2 = 0.4
+a2 = 0.65
+
+# Compute the linear combination of the analytical solutions
+u_initial = (
+    (c1 / 2)
+    * np.power(np.cosh(math.sqrt(c1) / 2 * (x - a1 * L)), -2)
+    + (c2 / 2)
+    * np.power(np.cosh(math.sqrt(c2) / 2 * (x - a2 * L)), -2)
+)
+
+# Function to compute numerical solution
+def compute_numerical_solution(t_max):
+    u = u_initial.copy()
+    etapes = int(t_max / dt)
+
+    # Initialize array to store numerical solution
+    numerical_solution = np.zeros((etapes, N))
+
+    # Time integration using Euler method
+    for i in range(etapes):
+        u_hat = fftshift(fft(u))
+        g_hat = np.exp(1j * ((2 * np.pi / L) * k) ** 3 * dt) * u_hat
+        g = ifft(ifftshift(g_hat)).real
+        dg2dx = ifft(ifftshift(1j * (2 * np.pi / L) * k * fftshift(fft(g ** 2)))).real
+        u = g - 3 * dg2dx * dt
+
+        # Store numerical solution at each time step
+        numerical_solution[i] = u
+
+    return numerical_solution
+
+# List of different t_max values
+t_max_values = [20, 40, 50, 60]
+
+# Create plots for different t_max values
+for t_max in t_max_values:
+    numerical_solution = compute_numerical_solution(t_max)
+
+    plt.figure(figsize=(8, 6))
+    plt.imshow(
+        numerical_solution.T,
+        aspect="auto",
+        origin="lower",
+        cmap="hot",
+        extent=[0, t_max, 0, L],
+        vmin=0,
+        vmax=max(c1 / 2, c2 / 2),
+    )
+    plt.colorbar(label="Numerical Solution")
+    plt.xlabel("Time")
+    plt.ylabel("Space")
+    plt.title(f"Numerical Solution at t_max = {t_max}")
+    plt.tight_layout()
+    plt.show()
